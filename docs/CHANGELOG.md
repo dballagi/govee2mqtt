@@ -209,6 +209,13 @@ segment. Both were fixed by reading what the devices already say.
   image from `distroless/cc-debian12` to `static-debian13` — every glibc CVE came from a library
   the static musl binary never calls — and the add-on base from Debian 12, end of life since
   July 2026, to 13.
+- The image scan reports only findings that have a fix. Home Assistant's Debian base carries
+  some 280 per architecture that Debian has not fixed, which no change here can touch and which
+  buried the ones a rebuild would clear.
+- The add-on images are rebuilt with Debian's security updates from the last two months —
+  openssl, curl, perl, pcre2, sqlite and others, including every critical finding. The add-on
+  image is only rebuilt on a release, so between releases these accumulate; nothing in the
+  add-on's own code changed for this. `rustls` is updated for GHSA-2mjx-qc3c-rqvc.
 - Every add-on option has a name and a description. The Bluetooth and transport options shipped
   as raw keys in the configuration UI for a while.
 
