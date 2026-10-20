@@ -204,7 +204,17 @@ impl State {
         self.iot_client.lock().await.replace(client);
     }
 
+    /// The AWS IoT client, but only while it is connected.
+    ///
+    /// A publish to a broker we have lost fails locally with MOSQ_ERR_NO_CONN,
+    /// and most callers treat that as the end of the command rather than a
+    /// reason to try another channel. Answering `None` instead makes every one
+    /// of them take the path it already has for "no IoT", which is to fall
+    /// through to the Platform API.
     pub async fn get_iot_client(&self) -> Option<IotClient> {
+        if !self.iot_is_connected() {
+            return None;
+        }
         self.iot_client.lock().await.clone()
     }
 

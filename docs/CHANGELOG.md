@@ -186,6 +186,13 @@ segment. Both were fixed by reading what the devices already say.
 - A speculative query may go unanswered without failing its session. Asking a device whether it
   has segments used to take a working Bluetooth-only light out of service on every poll.
 
+- **A short Home Assistant MQTT outage no longer cuts off AWS IoT until restart.** Passing a
+  status update on to Home Assistant failed while its broker was reconnecting, and that failure
+  ended the loop that listens to Govee. The IoT connection died with it, nothing reconnected it,
+  and every command routed over IoT failed from then on: a motion-triggered hallway routine
+  simply stopped working. The loop now logs the failure and carries on, and while IoT is down
+  commands fall through to the Platform API instead of failing.
+
 ## Packaging and CI
 
 - Everything publishes under `ghcr.io/phischl/govee2mqtt`. `addon/Dockerfile` pulled the binary

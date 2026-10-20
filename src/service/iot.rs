@@ -297,10 +297,14 @@ pub async fn start_iot_client(
         .await;
 
     tokio::spawn(async move {
-        if let Err(err) = run_iot_subscriber(subscriptions, state, client, acct).await {
+        if let Err(err) = run_iot_subscriber(subscriptions, state.clone(), client, acct).await {
             log::error!("IoT loop failed: {err:#}");
         }
         log::info!("IoT loop terminated");
+        // Nothing reconnects once the loop is gone, and no Disconnected event
+        // will arrive to say so. Without this, polling and control would keep
+        // choosing a channel that can no longer carry anything.
+        state.set_iot_connected(false);
         Ok::<(), anyhow::Error>(())
     });
 
@@ -577,7 +581,14 @@ async fn run_iot_subscriber(
                                     log::error!("registering segments for {device_id}: {err:#}");
                                 }
                             }
-                            state.notify_of_state_change(device_id).await?;
+                            // Home Assistant's broker being briefly away is no
+                            // reason to stop listening to Govee. Propagating this
+                            // used to end the loop for good: the IoT connection
+                            // died with it and every later command failed until
+                            // the add-on was restarted.
+                            if let Err(err) = state.notify_of_state_change(device_id).await {
+                                log::warn!("advising Home Assistant of {device_id}: {err:#}");
+                            }
                         }
                     }
                     Err(err) => {
