@@ -216,6 +216,10 @@ segment. Both were fixed by reading what the devices already say.
   openssl, curl, perl, pcre2, sqlite and others, including every critical finding. The add-on
   image is only rebuilt on a release, so between releases these accumulate; nothing in the
   add-on's own code changed for this. `rustls` is updated for GHSA-2mjx-qc3c-rqvc.
+- Dependencies are current: eight Rust crates (among them `tower-http` 0.7 and `csscolorparser`
+  0.9, both breaking releases that needed no code change), the standalone image's distroless
+  base, and the GitHub Actions the workflows run on. The lint and test workflows now hold a
+  read-only token.
 - Every add-on option has a name and a description. The Bluetooth and transport options shipped
   as raw keys in the configuration UI for a while.
 
