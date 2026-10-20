@@ -14,6 +14,10 @@ on:
       - "hacs.json"
       - ".github/workflows/component.yml"
 
+# Read-only: these jobs lint, test and validate, and publish nothing.
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint and test

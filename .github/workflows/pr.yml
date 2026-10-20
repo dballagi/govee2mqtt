@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+# Read-only: these jobs lint, test and validate, and publish nothing.
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
 
